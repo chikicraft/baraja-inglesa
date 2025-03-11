@@ -8,6 +8,7 @@ public class FrmJuego extends JFrame {
     private JPanel pnlJugador1, pnlJugador2;
     private JTabbedPane tpJugadores;
     private Jugador[] jugadores;
+    private Baraja baraja;
 
     public FrmJuego() {
         // Inicializar componentes
@@ -16,6 +17,7 @@ public class FrmJuego extends JFrame {
         tpJugadores = new JTabbedPane();
         pnlJugador1 = new JPanel();
         pnlJugador2 = new JPanel();
+        baraja = new Baraja();
         jugadores = new Jugador[2];
 
         // Inicializar jugadores
@@ -30,9 +32,9 @@ public class FrmJuego extends JFrame {
         setLayout(null);
 
         // Configuración de los paneles de jugadores
-        pnlJugador1.setBackground(new Color(153, 255, 51));
+        pnlJugador1.setBackground(new Color(13, 89, 24));
         pnlJugador1.setLayout(null);
-        pnlJugador2.setBackground(new Color(0, 255, 255));
+        pnlJugador2.setBackground(new Color(0, 18, 66));
         pnlJugador2.setLayout(null);
 
         // Agregar pestañas con los jugadores
@@ -63,9 +65,9 @@ public class FrmJuego extends JFrame {
     }
 
     private void btnRepartirClick(ActionEvent evt) {
-        // Reparte las cartas y las muestra en los paneles
+        baraja = new Baraja(); // Reiniciar la baraja al repartir de nuevo
         for (int i = 0; i < jugadores.length; i++) {
-            jugadores[i].repartir();
+            jugadores[i].repartir(baraja);
         }
         jugadores[0].mostrar(pnlJugador1, false);
         jugadores[1].mostrar(pnlJugador2, false);
@@ -73,20 +75,25 @@ public class FrmJuego extends JFrame {
 
     private void btnVerificarClick(ActionEvent evt) {
         int pestaña = tpJugadores.getSelectedIndex();
+        
+        if (pestaña < 0 || pestaña >= jugadores.length) {
+            JOptionPane.showMessageDialog(this, "Error: Selección inválida.");
+            return;
+        }
+        
         Jugador jugador = jugadores[pestaña];
     
-        if (jugador == null || jugador.obtenerFiguras().equals("No se han repartido cartas.")) {
+        if (jugador == null || jugador.obtenerFiguras() == null || jugador.obtenerFiguras().equals("No se han repartido cartas.")) {
             JOptionPane.showMessageDialog(this, "Primero debes repartir las cartas.");
             return;
         }
     
-        String mensaje = jugador.obtenerFiguras() + "\n" +
-                         jugador.obtenerEscaleras() + "\n" +
+        String mensaje = (jugador.obtenerFiguras() != null ? jugador.obtenerFiguras() + "\n" : "") +
+                         (jugador.obtenerEscaleras() != null ? jugador.obtenerEscaleras() + "\n" : "") +
                          "Puntaje total: " + jugador.calcularPuntaje();
     
         JOptionPane.showMessageDialog(this, mensaje);
     }
-       
 
     public static void main(String[] args) {
         new FrmJuego().setVisible(true);
