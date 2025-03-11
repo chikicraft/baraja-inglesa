@@ -8,6 +8,7 @@
    - [Carta.java](#cartajava)
    - [FrmJuego.java](#frmjuegojava)
    - [Jugador.java](#jugadorjava)
+3. [información](#web-de-donde-saqué-la-información-y-ayudas)
 
 ---
 
@@ -201,9 +202,14 @@ public class Jugador {
 }
 ```
 - **Método `calcularPuntaje()`**: Suma los valores de las cartas para determinar el puntaje del jugador.
-
 ---
 
-## Conclusión
-Este documento explica cada línea del código de los archivos principales, ayudando a comprender su funcionamiento y lógica. ¡Espero que sea útil!
+## Web de donde saqué la información y ayudas
+Para desarrollar este proyecto, se utilizaron las siguientes referencias y recursos:
+- [Documentación oficial de Java](https://docs.oracle.com/en/java/)
+- [Tutoriales de Java Swing](https://docs.oracle.com/javase/tutorial/uiswing/)
+- [Foros de Stack Overflow](https://stackoverflow.com/)
+- [Guías y ejemplos de programación en GitHub](https://github.com/)
+
+Estos recursos fueron clave para la implementación y depuración del código.
 
