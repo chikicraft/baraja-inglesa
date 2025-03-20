@@ -22,13 +22,14 @@ public class Jugador {
         return cartas[0] == null;
     }
 
-    public void mostrar(JPanel pnl, boolean tapada) {
+    public void mostrar(JPanel pnl, boolean tapada, String fondoJugador) {
         pnl.removeAll();
         for (int i = 0; i < 10; i++) {
-            cartas[i].mostrarCarta(10 + i * 52, 40, pnl, tapada);
+            cartas[i].mostrarCarta(10 + i * 52, 40, pnl, tapada, fondoJugador);
         }
         pnl.repaint();
     }
+    
 
     public String obtenerFiguras() {
         if (cartas[0] == null) return "No se han repartido cartas.";

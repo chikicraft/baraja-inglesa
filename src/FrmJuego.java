@@ -8,7 +8,7 @@ public class FrmJuego extends JFrame {
     private JTabbedPane tpJugadores;
     private Jugador[] jugadores;
     private String[] nombres;
-    private String[] fondos = {"fondo1.jpg", "fondo2.jpg"};
+    private String[] fondos = {"fondo1.jpg", "fondo2.jpg", "fondo3.jpg"};
 
     public FrmJuego(int cantidadJugadores, String[] nombres) {
         this.nombres = nombres;
@@ -65,9 +65,11 @@ public class FrmJuego extends JFrame {
     private void btnRepartirClick(ActionEvent evt) {
         for (int i = 0; i < jugadores.length; i++) {
             jugadores[i].repartir();
-            jugadores[i].mostrar(panelesJugadores[i], false);
+            final int index = i % fondos.length; // Seleccionar el fondo correcto
+            jugadores[i].mostrar(panelesJugadores[i], false, fondos[index]);
         }
     }
+    
 
     private void btnVerificarClick(ActionEvent evt) {
         StringBuilder mensaje = new StringBuilder();
@@ -79,7 +81,8 @@ public class FrmJuego extends JFrame {
             mensaje.append(nombres[i]).append(":\n")
                    .append(jugadores[i].obtenerFiguras()).append("\n")
                    .append(jugadores[i].obtenerEscaleras()).append("\n")
-                   .append("Puntaje total: ").append(puntaje).append("\n\n");
+                   .append("Puntaje total: ").append(puntaje).append("\n\n")
+                   .append("------------------------------------------------\n\n");
             
             if (puntaje > maxPuntaje) {
                 maxPuntaje = puntaje;
