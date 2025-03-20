@@ -107,3 +107,6 @@ public class Carta {
         dialogo.setVisible(true);
     }
 }
+
+//juan se estresa con este codigo y sara ya no quiere mas
+//profeee ayudaaaaaaaaaaa

@@ -2,6 +2,9 @@
 
 Este proyecto es un juego de cartas en Java desarrollado con Swing para la interfaz gráfica. Permite a dos jugadores competir en la obtención de combinaciones y escaleras con una baraja.
 
+## Autores
+Este proyecto fue desarrollado por **Sara Delgado Mira** y **Juan David Rojas Villegas**.
+
 ## Estructura del Código
 
 El juego está compuesto por las siguientes clases:
@@ -80,4 +83,7 @@ public class App {
 ## Referencias
 - Documentación de Java Swing: [https://docs.oracle.com/javase/tutorial/uiswing/](https://docs.oracle.com/javase/tutorial/uiswing/)
 - Generación de números aleatorios en Java: [https://docs.oracle.com/javase/8/docs/api/java/util/Random.html](https://docs.oracle.com/javase/8/docs/api/java/util/Random.html)
+- Uso de `JTabbedPane` en Java Swing: [https://docs.oracle.com/javase/tutorial/uiswing/components/tabbedpane.html](https://docs.oracle.com/javase/tutorial/uiswing/components/tabbedpane.html)
+- Eventos de Mouse en Java Swing: [https://docs.oracle.com/javase/tutorial/uiswing/events/mouselistener.html](https://docs.oracle.com/javase/tutorial/uiswing/events/mouselistener.html)
+- Manipulación de imágenes en Java: [https://docs.oracle.com/javase/tutorial/2d/images/](https://docs.oracle.com/javase/tutorial/2d/images/)
 
