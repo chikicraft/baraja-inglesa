@@ -8,7 +8,7 @@ public class FrmJuego extends JFrame {
     private JTabbedPane tpJugadores;
     private Jugador[] jugadores;
     private String[] nombres;
-    private String[] fondos = {"fondo1.jpg", "fondo2.jpg", "fondo3.jpg"};
+    private String[] fondos = {"fondo1.jpg", "fondo2.jpg"};
 
     public FrmJuego(int cantidadJugadores, String[] nombres) {
         this.nombres = nombres;
@@ -72,6 +72,14 @@ public class FrmJuego extends JFrame {
     
 
     private void btnVerificarClick(ActionEvent evt) {
+
+        for (Jugador jugador : jugadores) {
+            if (jugador.cartasVacias()) {
+                JOptionPane.showMessageDialog(this, "No se puede verificar. Debes repartir cartas primero.");
+                return; // Salir del método sin hacer más verificaciones
+            }
+        }
+        
         StringBuilder mensaje = new StringBuilder();
         int maxPuntaje = -1;
         String ganador = "";
@@ -93,7 +101,8 @@ public class FrmJuego extends JFrame {
         }
         
         if (!ganador.equals("Empate")) {
-            mensaje.append("¡Ganador: ").append(ganador).append("!");
+            mensaje.append("¡Ganador : ").append(ganador).append("!");
+            mensaje.append("\n\n");
         } else {
             mensaje.append("¡Es un empate!");
         }
