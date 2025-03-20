@@ -1,40 +1,9 @@
 import java.util.*;
 import javax.swing.*;
-import java.awt.event.*;
-import java.awt.*;
-import java.util.List;
-
-enum Figura {
-    PAR(2), TERNA(3), CUARTA(4), QUINTA(5),
-    SEXTA(6), SEPTIMA(7), OCTAVA(8), NOVENA(9), DECIMA(10);
-
-    private final int cantidad;
-
-    Figura(int cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    public static String obtenerNombre(int cantidad) {
-        for (Figura f : values()) {
-            if (f.cantidad == cantidad) {
-                return f.name();
-            }
-        }
-        return null;
-    }
-}
-
-// Enum para Pinta
-enum Pinta {
-    TREBOL, PICA, CORAZON, DIAMANTE;
-}
-
-// Enum para Nombre de Carta
-enum NombreCarta {
-    A, DOS, TRES, CUATRO, CINCO, SEIS, SIETE, OCHO, NUEVE, DIEZ, J, Q, K;
-}
 
 public class Jugador {
+    public enum Combinacion { PAR, TERNA, CUARTA, QUINTA, SEXTA, SEPTIMA, OCTAVA, NOVENA, DECIMA }
+
     private Random r;
     private Carta[] cartas;
 
@@ -43,97 +12,106 @@ public class Jugador {
         cartas = new Carta[10];
     }
 
-    public void repartir(Baraja baraja) {
+    public void repartir() {
         for (int i = 0; i < 10; i++) {
-            int indiceCarta = baraja.repartirCarta();
-            if (indiceCarta != -1) {
-                cartas[i] = new Carta(indiceCarta);
-            }
+            cartas[i] = new Carta(r);
         }
     }
-    
+
+    public boolean cartasVacias() {
+        return cartas[0] == null;
+    }
 
     public void mostrar(JPanel pnl, boolean tapada) {
         pnl.removeAll();
         for (int i = 0; i < 10; i++) {
-            Carta carta = cartas[i];
-            JLabel lblCarta = carta.mostrarCartaComoLabel(10 + i * 50, 10, tapada);
-            final int index = i;
-            lblCarta.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    mostrarVentanaCarta(index);
-                }
-            });
-            pnl.add(lblCarta);
+            cartas[i].mostrarCarta(10 + i * 52, 40, pnl, tapada);
         }
         pnl.repaint();
     }
 
-    private void mostrarVentanaCarta(int index) {
-        Carta carta = cartas[index];
-        JFrame ventanaCarta = new JFrame("Detalle de la Carta");
-        ventanaCarta.setSize(250, 300);
-        ventanaCarta.setLayout(new BorderLayout());
-        ventanaCarta.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        JLabel lblTexto = new JLabel("Carta: " + carta.obtenerNombre() + " de " + carta.obtenerPinta(), SwingConstants.CENTER);
-        JLabel lblImagen = new JLabel(new ImageIcon(getClass().getResource("/img/Carta" + carta.getIndice() + ".png")));
-
-        ventanaCarta.add(lblTexto, BorderLayout.NORTH);
-        ventanaCarta.add(lblImagen, BorderLayout.CENTER);
-
-        ventanaCarta.setLocationRelativeTo(null); // Centrar ventana
-        ventanaCarta.setVisible(true);
-    }
-
     public String obtenerFiguras() {
-        if (cartas == null || cartas[0] == null) {
-            return "No se han repartido cartas.";
-        }
-
-        int[] contadores = new int[13];
+        if (cartas[0] == null) return "No se han repartido cartas.";
+        
+        Map<Carta.Nombre, Integer> contadores = new HashMap<>();
         for (Carta carta : cartas) {
-            contadores[carta.obtenerNombre().ordinal()]++;
+            contadores.put(carta.obtenerNombre(), contadores.getOrDefault(carta.obtenerNombre(), 0) + 1);
         }
-
+        
         StringBuilder resultado = new StringBuilder("Figuras encontradas:\n");
         boolean hayFiguras = false;
-
-        for (int i = 0; i < 13; i++) {
-            if (contadores[i] >= 2) {
-                String tipoFigura = Figura.obtenerNombre(contadores[i]);
-                if (tipoFigura != null) {
-                    resultado.append(tipoFigura).append(" de ").append(NombreCarta.values()[i]).append("\n");
-                    hayFiguras = true;
-                }
+        
+        for (Map.Entry<Carta.Nombre, Integer> entry : contadores.entrySet()) {
+            if (entry.getValue() >= 2) {
+                resultado.append(identificarCombinacion(entry.getValue())).append(" de ").append(entry.getKey()).append("\n");
+                hayFiguras = true;
             }
         }
-
+        
         return hayFiguras ? resultado.toString() : "No hay figuras.";
     }
 
+    private String identificarCombinacion(int cantidad) {
+        switch (cantidad) {
+            case 2: return "Par";
+            case 3: return "Terna";
+            case 4: return "Cuarta";
+            case 5: return "Quinta";
+            case 6: return "Sexta";
+            case 7: return "Séptima";
+            case 8: return "Octava";
+            case 9: return "Novena";
+            case 10: return "Décima";
+            default: return "";
+        }
+    }
+
+    public int calcularPuntaje() {
+        int puntaje = 0;
+        Set<Integer> cartasUsadas = new HashSet<>();
+    
+        Map<Carta.Nombre, Integer> contadores = new HashMap<>();
+        for (Carta carta : cartas) {
+            contadores.put(carta.obtenerNombre(), contadores.getOrDefault(carta.obtenerNombre(), 0) + 1);
+        }
+        for (Map.Entry<Carta.Nombre, Integer> entry : contadores.entrySet()) {
+            if (entry.getValue() >= 3) {
+                for (Carta carta : cartas) {
+                    if (carta.obtenerNombre().equals(entry.getKey())) {
+                        cartasUsadas.add(carta.obtenerValor());
+                    }
+                }
+            }
+        }
+    
+        for (Carta carta : cartas) {
+            if (!cartasUsadas.contains(carta.obtenerValor())) {
+                puntaje += carta.obtenerValor();
+            }
+        }
+    
+        return puntaje;
+    }
 
     public String obtenerEscaleras() {
-        if (cartas == null || cartas[0] == null) {
-            return "No se han repartido cartas.";
+        if (cartas[0] == null) return "No se han repartido cartas.";
+    
+        Map<Carta.Pinta, List<Integer>> cartasPorPinta = new HashMap<>();
+        for (Carta.Pinta pinta : Carta.Pinta.values()) {
+            cartasPorPinta.put(pinta, new ArrayList<>());
         }
-        
-        Map<Pinta, List<Integer>> cartasPorPinta = new HashMap<>();
-        for (Pinta p : Pinta.values()) {
-            cartasPorPinta.put(p, new ArrayList<>());
-        }
-
+    
         for (Carta carta : cartas) {
             cartasPorPinta.get(carta.obtenerPinta()).add(carta.obtenerValor());
         }
-
+    
         StringBuilder resultado = new StringBuilder("Escaleras encontradas:\n");
         boolean hayEscaleras = false;
-
-        for (Map.Entry<Pinta, List<Integer>> entry : cartasPorPinta.entrySet()) {
+    
+        for (Map.Entry<Carta.Pinta, List<Integer>> entry : cartasPorPinta.entrySet()) {
             List<Integer> valores = entry.getValue();
             Collections.sort(valores);
-
+    
             int contador = 1;
             for (int i = 1; i < valores.size(); i++) {
                 if (valores.get(i) == valores.get(i - 1) + 1) {
@@ -151,19 +129,7 @@ public class Jugador {
                 hayEscaleras = true;
             }
         }
-
+    
         return hayEscaleras ? resultado.toString() : "No hay escaleras.";
-    }
-
-    public int calcularPuntaje() {
-        if (cartas == null || cartas[0] == null) {
-            return 0;
-        }
-        
-        int puntaje = 0;
-        for (Carta carta : cartas) {
-            puntaje += carta.obtenerValor();
-        }
-        return puntaje;
     }
 }

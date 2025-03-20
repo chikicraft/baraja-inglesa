@@ -1,101 +1,100 @@
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 
 public class FrmJuego extends JFrame {
     private JButton btnRepartir, btnVerificar;
-    private JPanel pnlJugador1, pnlJugador2;
+    private JPanel[] panelesJugadores;
     private JTabbedPane tpJugadores;
     private Jugador[] jugadores;
-    private Baraja baraja;
+    private String[] nombres;
+    private String[] fondos = {"fondo1.jpg", "fondo2.jpg"};
 
-    public FrmJuego() {
-        // Inicializar componentes
-        btnRepartir = new JButton("Repartir");
-        btnVerificar = new JButton("Verificar");
-        tpJugadores = new JTabbedPane();
-        pnlJugador1 = new JPanel();
-        pnlJugador2 = new JPanel();
-        baraja = new Baraja();
-        jugadores = new Jugador[2];
+    public FrmJuego(int cantidadJugadores, String[] nombres) {
+        this.nombres = nombres;
+        jugadores = new Jugador[cantidadJugadores];
+        panelesJugadores = new JPanel[cantidadJugadores];
 
         // Inicializar jugadores
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < cantidadJugadores; i++) {
             jugadores[i] = new Jugador();
         }
 
-        // Configuración de la ventana
-        setSize(575, 250);
+        setSize(600, 300);
         setTitle("Juego de Cartas");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLayout(null);
 
-        // Configuración de los paneles de jugadores
-        pnlJugador1.setBackground(new Color(13, 89, 24));
-        pnlJugador1.setLayout(null);
-        pnlJugador2.setBackground(new Color(0, 18, 66));
-        pnlJugador2.setLayout(null);
-
-        // Agregar pestañas con los jugadores
-        tpJugadores.setBounds(10, 60, 535, 135);
-        tpJugadores.addTab("Juan David", pnlJugador1);
-        tpJugadores.addTab("Sara Delgado", pnlJugador2);
-
-        // Configuración del botón "Repartir"
+        // Configuración de los botones
+        btnRepartir = new JButton("Repartir");
         btnRepartir.setBounds(10, 10, 100, 25);
         btnRepartir.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 btnRepartirClick(evt);
             }
         });
+        add(btnRepartir);
 
-        // Configuración del botón "Verificar"
+        btnVerificar = new JButton("Verificar");
         btnVerificar.setBounds(120, 10, 100, 25);
         btnVerificar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 btnVerificarClick(evt);
             }
         });
-
-        // Agregar componentes a la ventana
-        add(tpJugadores);
-        add(btnRepartir);
         add(btnVerificar);
+
+        // Configuración de los paneles de jugadores
+        tpJugadores = new JTabbedPane();
+        tpJugadores.setBounds(10, 50, 560, 200);
+        for (int i = 0; i < cantidadJugadores; i++) {
+            final int index = i % fondos.length; // Asegurar que el índice no se salga del array
+            panelesJugadores[i] = new JPanel() {
+                private Image fondo = new ImageIcon(getClass().getResource("/img/" + fondos[index])).getImage();
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    g.drawImage(fondo, 0, 0, getWidth(), getHeight(), this);
+                }
+            };
+            panelesJugadores[i].setLayout(null);
+            tpJugadores.addTab(nombres[i], panelesJugadores[i]);
+        }
+        add(tpJugadores);
     }
 
     private void btnRepartirClick(ActionEvent evt) {
-        baraja = new Baraja(); // Reiniciar la baraja al repartir de nuevo
         for (int i = 0; i < jugadores.length; i++) {
-            jugadores[i].repartir(baraja);
+            jugadores[i].repartir();
+            jugadores[i].mostrar(panelesJugadores[i], false);
         }
-        jugadores[0].mostrar(pnlJugador1, false);
-        jugadores[1].mostrar(pnlJugador2, false);
     }
 
     private void btnVerificarClick(ActionEvent evt) {
-        int pestaña = tpJugadores.getSelectedIndex();
-        
-        if (pestaña < 0 || pestaña >= jugadores.length) {
-            JOptionPane.showMessageDialog(this, "Error: Selección inválida.");
-            return;
-        }
-        
-        Jugador jugador = jugadores[pestaña];
-    
-        if (jugador == null || jugador.obtenerFiguras() == null || jugador.obtenerFiguras().equals("No se han repartido cartas.")) {
-            JOptionPane.showMessageDialog(this, "Primero debes repartir las cartas.");
-            return;
-        }
-    
-        String mensaje = (jugador.obtenerFiguras() != null ? jugador.obtenerFiguras() + "\n" : "") +
-                         (jugador.obtenerEscaleras() != null ? jugador.obtenerEscaleras() + "\n" : "") +
-                         "Puntaje total: " + jugador.calcularPuntaje();
-    
-        JOptionPane.showMessageDialog(this, mensaje);
-    }
+        StringBuilder mensaje = new StringBuilder();
+        int maxPuntaje = -1;
+        String ganador = "";
 
-    public static void main(String[] args) {
-        new FrmJuego().setVisible(true);
+        for (int i = 0; i < jugadores.length; i++) {
+            int puntaje = jugadores[i].calcularPuntaje();
+            mensaje.append(nombres[i]).append(":\n")
+                   .append(jugadores[i].obtenerFiguras()).append("\n")
+                   .append(jugadores[i].obtenerEscaleras()).append("\n")
+                   .append("Puntaje total: ").append(puntaje).append("\n\n");
+            
+            if (puntaje > maxPuntaje) {
+                maxPuntaje = puntaje;
+                ganador = nombres[i];
+            } else if (puntaje == maxPuntaje) {
+                ganador = "Empate";
+            }
+        }
+        
+        if (!ganador.equals("Empate")) {
+            mensaje.append("¡Ganador: ").append(ganador).append("!");
+        } else {
+            mensaje.append("¡Es un empate!");
+        }
+        
+        JOptionPane.showMessageDialog(this, mensaje.toString());
     }
 }
